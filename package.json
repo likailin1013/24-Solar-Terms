@@ -13,7 +13,6 @@
     "prepare": "node scripts/setup-git-hooks.mjs"
   },
   "dependencies": {
-    "@lark-apaas/client-toolkit-lite": "^1.1.20",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -66,11 +65,12 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@lark-apaas/coding-preset-vite-react": "^1.0.16",
     "@lark-apaas/coding-presets-react": "^0.1.0",
+    "@tailwindcss/vite": "^4.3.2",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.0.3",
     "concurrently": "^9",
     "eslint": "^9",
     "typescript": "~5.9",

@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
 import type { Season } from '@/data/solarTerms';
-import { logger } from '@lark-apaas/client-toolkit-lite';
 
 interface ParticleLayerProps {
   season: Season;
@@ -42,7 +41,7 @@ export default function ParticleLayer({ season }: ParticleLayerProps) {
       }
       setParticles(newParticles);
     } catch (e) {
-      logger.error('Particle init failed:', String(e));
+      console.error('Particle init failed:', String(e));
     }
   }, [config]);
 

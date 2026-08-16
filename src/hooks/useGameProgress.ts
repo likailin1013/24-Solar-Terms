@@ -1,9 +1,33 @@
 // EXPORTS: IGameProgress, useGameProgress, STORAGE_KEY
 
 import { useState, useEffect, useCallback } from 'react';
-import { scopedStorage } from '@lark-apaas/client-toolkit-lite';
 
 const STORAGE_KEY = '__game_suishiji_progress_v2';
+
+/**
+ * 独立部署：直接用浏览器 localStorage 持久化（替代原平台 scopedStorage），
+ * 不复用任何平台依赖，保证脱离飞书环境后进度仍可正常存取。
+ */
+function loadProgress(): IGameProgress {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return { ...INITIAL_PROGRESS, ...parsed };
+    }
+  } catch {
+    // ignore
+  }
+  return INITIAL_PROGRESS;
+}
+
+function saveProgress(progress: IGameProgress) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  } catch {
+    // ignore
+  }
+}
 
 export interface IGameProgress {
   /** 当前累计岁时值 */
@@ -43,27 +67,6 @@ const INITIAL_PROGRESS: IGameProgress = {
   beautyScore: 0,
   currentTermId: 'lichun',
 };
-
-function loadProgress(): IGameProgress {
-  try {
-    const raw = scopedStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      return { ...INITIAL_PROGRESS, ...parsed };
-    }
-  } catch {
-    // ignore
-  }
-  return INITIAL_PROGRESS;
-}
-
-function saveProgress(progress: IGameProgress) {
-  try {
-    scopedStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-  } catch {
-    // ignore
-  }
-}
 
 export function useGameProgress() {
   const [progress, setProgress] = useState<IGameProgress>(loadProgress);

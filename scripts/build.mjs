@@ -8,6 +8,10 @@ import { dirname, resolve } from 'node:path';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const useShell = process.platform === 'win32';
 
+// 独立部署：禁用 preset 内置的 Google Fonts → miaoda.feishu.cn 改写，
+// 确保产物中不存在任何飞书私有域请求。
+process.env.MIAODA_FONTS_MIRROR_OFF = process.env.MIAODA_FONTS_MIRROR_OFF || '1';
+
 function run(cmd, args, label) {
   console.log(`\n> ${label}`);
   const result = spawnSync(cmd, args, { cwd: root, stdio: 'inherit', shell: useShell });

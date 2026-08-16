@@ -14,6 +14,8 @@ const child = spawn(process.execPath, [viteBin], {
   env: {
     ...process.env,
     CLIENT_BASE_PATH: process.env.CLIENT_BASE_PATH || '/',
+    // 独立部署：禁用 Google Fonts → miaoda.feishu.cn 改写，避免飞书私有域请求。
+    MIAODA_FONTS_MIRROR_OFF: process.env.MIAODA_FONTS_MIRROR_OFF || '1',
   },
 });
 

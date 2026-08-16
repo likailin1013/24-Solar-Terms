@@ -26,7 +26,7 @@
 | 动画 | framer-motion（面板滑入/轮盘/盖章）+ CSS keyframes（粒子） |
 | UI 组件 | shadcn/ui（Radix 封装，`src/components/ui/` 55 个） |
 | 图标 / 反馈 | lucide-react / sonner（toast） |
-| 平台基建 | `@lark-apaas/client-toolkit-lite`（AppContainer、scopedStorage、logger） |
+| 平台基建 | 无（完全独立部署：无外部/私有域请求；进度直接 `localStorage`，日志走 `console`） |
 
 ---
 
@@ -42,10 +42,10 @@
 ├── PRO.md / 《岁时记》各模块细化设计文档.md
 ├── scripts/                    # dev.mjs / build.mjs / setup-git-hooks.mjs
 ├── .githooks/pre-commit        # git 钩子（prepare 注册 core.hooksPath）
-├── public/                     # favicon.svg / icons.svg
+├── public/                     # favicon.svg / icons.svg / images（四季场景与角色 SVG）
 ├── shared/                     # 仅 README 占位（static 目录未使用）
 └── src/
-    ├── index.tsx               # 入口：createRoot → BrowserRouter → AppContainer → ErrorBoundary
+    ├── index.tsx               # 入口：createRoot → BrowserRouter → ErrorBoundary → App
     ├── app.tsx                 # 路由表：HomePage(/) + NotFoundPage(*)
     ├── index.css               # 引入 tailwind + 主题 + 字体
     ├── tailwind-theme.css      # 9 个 CSS token + 四季语义色（379 行）
@@ -90,7 +90,7 @@ flowchart TB
     subgraph L1["① 入口与构建层"]
         HTML[index.html<br/>Vite 挂载点]
         VITE[vite.config.ts<br/>@ → src]
-        ENTRY["src/index.tsx 入口<br/>createRoot → BrowserRouter →<br/>AppContainer → ErrorBoundary"]
+        ENTRY["src/index.tsx 入口<br/>createRoot → BrowserRouter →<br/>ErrorBoundary → App"]
     end
 
     subgraph L2["② 路由层 (react-router-dom)"]
@@ -184,7 +184,7 @@ classDiagram
     HomePage --> ActivityGame : 启动小游戏
     HomePage --> MOCK_SOLAR_TERMS : 当前节气
     useGameProgress --> IGameProgress : 维护
-    useGameProgress --> localStorage : scopedStorage 持久化
+    useGameProgress --> localStorage : 直接 localStorage 持久化
     TermDetailPanel ..> useGameProgress : 只读 progress
     HandbookPanel ..> useGameProgress : 只读 progress
     VisitorsPanel ..> useGameProgress : 只读 progress
@@ -221,7 +221,7 @@ classDiagram
 
 - `IGameProgress`：12 个字段 —— `yearValue`、6 类收集列表、`metVisitors`、`decorations`、`beautyScore`、`currentTermId`
 - 12 个操作方法，全部走函数式 `setState`（`prev => ...`），**带幂等去重**（重复收集不重复加分）
-- **持久化**：`scopedStorage`（client-toolkit 封装）→ `localStorage`，key = `__game_suishiji_progress_v2`；每次 `progress` 变化自动写入
+- **持久化**：直接浏览器 `localStorage`，key = `__game_suishiji_progress_v2`；每次 `progress` 变化自动写入
 
 ```
 用户交互（点击节气/收集/完成活动）
@@ -258,7 +258,7 @@ useGameProgress 操作函数（setProgress，幂等去重 + 加分）
 **遗留说明**：
 - `shared/` 目录仍为占位（无静态资源），`@shared` 别名保留待用
 - `components/ui/` 模板组件中未被业务引用的部分（chart/form/calendar 等）按模板约定保留，其依赖（recharts/react-day-picker/react-hook-form 等）一并保留
-- 构建产物存在大 chunk 警告（toolkit 734KB），为 client-toolkit 体积所致，可后续按需优化
+- 已脱离飞书平台运行（移除 `@lark-apaas/client-toolkit-lite`），构建产物不再依赖任何私有域请求（字体/图片/日志均已本地化）
 
 ---
 

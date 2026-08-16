@@ -13,7 +13,7 @@
 | 动画 | framer-motion + CSS keyframes |
 | UI 组件 | shadcn/ui（`src/components/ui/`，Radix 封装） |
 | 图标 / 反馈 | lucide-react / sonner |
-| 平台基建 | `@lark-apaas/client-toolkit-lite` |
+| 平台基建 | 无（完全独立部署：无任何外部/私有域请求，进度直接 localStorage） |
 
 ## 常用命令
 
@@ -34,9 +34,9 @@ npm run precommit  # 提交门禁（= npm run lint）
 ├── components.json            # shadcn/ui 配置
 ├── scripts/                   # 构建/开发脚本（dev.mjs / build.mjs / setup-git-hooks.mjs）
 ├── .githooks/pre-commit       # git 钩子（npm install 时注册 core.hooksPath=.githooks）
-├── public/                    # favicon / icons
+├── public/                    # 静态资源（favicon / icons / images 四季场景与角色 SVG）
 └── src/
-    ├── index.tsx              # 入口：createRoot → BrowserRouter → AppContainer → ErrorBoundary（勿修改）
+    ├── index.tsx              # 入口：createRoot → BrowserRouter → ErrorBoundary → App
     ├── app.tsx                # 路由配置：index → HomePage，* → NotFoundPage
     ├── index.css              # 样式入口（引入 tailwind + 主题 + 字体）
     ├── tailwind-theme.css     # CSS 变量主题（背景/前景/主色/边框等 token）
@@ -78,8 +78,8 @@ npm run precommit  # 提交门禁（= npm run lint）
   - 24 节气（含三候 / 活动 / 食膳 / 作物）与四季色板：`src/data/solarTerms.ts`
   - 访客：`src/data/visitors.ts`；花卉：`src/data/flowers.ts`
   - 装饰物：`src/data/decorations.ts`；手作器物：`src/data/handcrafts.ts`
-- **玩家进度**：`src/hooks/useGameProgress.ts` 为唯一状态源（12 字段 × 12 操作），经 `scopedStorage` 持久化到 localStorage，key = `__game_suishiji_progress_v2`
-- **图片资源**：季节庭院 / 角色图 URL 配置于 `src/lib/season-images.ts`
+- **玩家进度**：`src/hooks/useGameProgress.ts` 为唯一状态源（12 字段 × 12 操作），直接通过浏览器 `localStorage` 持久化，key = `__game_suishiji_progress_v2`
+- **图片资源**：四季庭院 / 角色图为本地 SVG（`public/images/`），URL 配置于 `src/lib/season-images.ts`
 
 ## 路由配置
 
@@ -108,7 +108,6 @@ HSL 格式使用空格分隔：`--primary: hsl(5 75% 45%);`
 
 | 文件 | 原因 |
 |---|---|
-| `src/index.tsx` | Provider 层级 + 样式引入，由模板管理 |
 | `src/components/ui/*` | shadcn/ui 内置组件，版本锁定 |
 
 ## 导入路径
