@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>岁时记 · 项目架构图</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #f2ecdd; }
+  svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1590" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">
+  <defs>
+    <marker id="arwSolid" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6b6258"/>
+    </marker>
+    <marker id="arwDash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a6d3b"/>
+    </marker>
+    <style>
+      .band  { fill:#fdfbf5; stroke:#d8cdb4; stroke-width:1.5; }
+      .box   { fill:#ffffff; stroke:#c9bfa8; stroke-width:1.2; }
+      .gbox  { stroke-width:1.5; }
+      .chip  { rx:6; }
+      .bt    { font-size:15px; font-weight:700; fill:#3d3a33; }
+      .bl    { font-size:12.5px; fill:#4f4a42; }
+      .bs    { font-size:11px; fill:#8a8275; }
+      .gtt   { font-size:15px; font-weight:700; }
+      .bt2   { font-size:13.5px; font-weight:700; fill:#3d3a33; }
+      .bl2   { font-size:12px; fill:#5a554a; }
+      .note  { font-size:12.5px; fill:#7a7569; }
+      .foot  { font-size:13px; fill:#8a8275; }
+      .lbl   { font-size:14px; font-weight:700; fill:#ffffff; }
+      .ttl   { font-size:34px; font-weight:800; fill:#3d3a33; }
+      .sub   { font-size:17px; fill:#6b6258; }
+      .leg   { font-size:12.5px; fill:#5a554a; }
+      .ct    { font-size:14px; font-weight:700; fill:#b13a2b; }
+    </style>
+  </defs>
+
+  <!-- 背景 -->
+  <rect x="0" y="0" width="1600" height="1590" fill="#f7f3e9"/>
+  <!-- 宣纸纹理（细噪点） -->
+  <filter id="paper"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.03"/></feComponentTransfer></filter>
+  <rect x="0" y="0" width="1600" height="1590" filter="url(#paper)" fill="#000" pointer-events="none"/>
+
+  <!-- 标题 -->
+  <text class="ttl" x="800" y="54" text-anchor="middle">岁时记 · 二十四节气经营游戏 —— 项目架构图</text>
+  <text class="sub" x="800" y="88" text-anchor="middle">React 19 · TypeScript · Tailwind CSS v4 · Vite 8 ｜ 单页应用 · 数据内置 mock · localStorage 持久化</text>
+
+  <!-- 图例 -->
+  <rect x="1120" y="105" width="440" height="76" rx="10" fill="#fdfbf5" stroke="#d8cdb4" stroke-width="1.2"/>
+  <line x1="1140" y1="133" x2="1176" y2="133" stroke="#6b6258" stroke-width="2" marker-end="url(#arwSolid)"/>
+  <text class="leg" x="1190" y="138">实线 = 渲染 / 组合（组件树）</text>
+  <line x1="1140" y1="163" x2="1176" y2="163" stroke="#8a6d3b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arwDash)"/>
+  <text class="leg" x="1190" y="168">虚线 = 数据读写（进度 / mock 数据）</text>
+
+  <!-- ================= ① 入口与构建层 ================= -->
+  <rect class="band" x="40" y="180" width="1520" height="95" rx="14"/>
+  <rect class="chip" x="52" y="196" width="180" height="34" fill="#6b6258"/>
+  <text class="lbl" x="66" y="219">① 入口与构建层</text>
+
+  <rect class="box" x="330" y="195" width="200" height="56" rx="8"/>
+  <text class="bt" x="430" y="218" text-anchor="middle">index.html</text>
+  <text class="bs" x="430" y="238" text-anchor="middle">Vite 挂载点 &lt;div#root&gt;</text>
+
+  <rect class="box" x="580" y="195" width="200" height="56" rx="8"/>
+  <text class="bt" x="680" y="218" text-anchor="middle">vite.config.ts</text>
+  <text class="bs" x="680" y="238" text-anchor="middle">@ → src · @shared → shared</text>
+
+  <rect class="box" x="830" y="188" width="330" height="70" rx="8" stroke="#b13a2b" stroke-width="1.8" fill="#fdf3f0"/>
+  <text x="995" y="214" text-anchor="middle" font-size="14.5px" font-weight="700" fill="#b13a2b">src/index.tsx 入口</text>
+  <text class="bl" x="995" y="235" text-anchor="middle">createRoot → &lt;BrowserRouter&gt;</text>
+  <text class="bl" x="995" y="253" text-anchor="middle">&lt;AppContainer&gt; → &lt;ErrorBoundary&gt; → App</text>
+
+  <text class="note" x="1215" y="216">React 19 · StrictMode</text>
+  <text class="note" x="1215" y="238">react-error-boundary 兜底</text>
+  <text class="note" x="1215" y="260">@lark-apaas 容器 / logger</text>
+
+  <!-- ①→② -->
+  <line x1="995" y1="258" x2="995" y2="300" stroke="#6b6258" stroke-width="2" marker-end="url(#arwSolid)"/>
+
+  <!-- ================= ② 路由层 ================= -->
+  <rect class="band" x="40" y="300" width="1520" height="100" rx="14"/>
+  <rect class="chip" x="52" y="316" width="150" height="34" fill="#6b6258"/>
+  <text class="lbl" x="127" y="339" text-anchor="middle">② 路由层</text>
+
+  <rect class="box" x="400" y="315" width="260" height="66" rx="8"/>
+  <text class="bt" x="530" y="338" text-anchor="middle">src/app.tsx</text>
+  <text class="bl" x="530" y="358" text-anchor="middle">&lt;Routes&gt; · Layout 包裹</text>
+  <text class="bl" x="530" y="374" text-anchor="middle">index → HomePage · * → NotFound</text>
+
+  <rect class="box" x="760" y="315" width="210" height="66" rx="8"/>
+  <text class="bt" x="865" y="338" text-anchor="middle">Layout.tsx</text>
+  <text class="bs" x="865" y="358" text-anchor="middle">空壳容器 &lt;Outlet/&gt;</text>
+
+  <rect class="box" x="1030" y="315" width="230" height="66" rx="8"/>
+  <text class="bt" x="1145" y="338" text-anchor="middle">NotFoundPage.tsx</text>
+  <text class="bs" x="1145" y="358" text-anchor="middle">404 兜底页</text>
+
+  <text class="note" x="1285" y="346">react-router-dom 7</text>
+  <text class="note" x="1285" y="366">BrowserRouter 由入口提供</text>
+
+  <!-- ②→③ -->
+  <line x1="530" y1="381" x2="530" y2="485" stroke="#6b6258" stroke-width="2" marker-end="url(#arwSolid)"/>
+
+  <!-- ================= ③ 页面编排层 ================= -->
+  <rect class="band" x="40" y="445" width="1520" height="230" rx="14"/>
+  <rect class="chip" x="52" y="461" width="200" height="34" fill="#b13a2b"/>
+  <text class="lbl" x="152" y="484" text-anchor="middle">③ 页面编排层（核心）</text>
+
+  <rect x="120" y="485" width="1360" height="165" rx="10" fill="#ffffff" stroke="#c9bfa8" stroke-width="1.4"/>
+  <rect x="120" y="485" width="1360" height="38" rx="10" fill="#b13a2b"/>
+  <rect x="120" y="507" width="1360" height="16" fill="#b13a2b"/>
+  <text x="140" y="510" font-size="15px" font-weight="700" fill="#fff">src/pages/HomePage/HomePage.tsx · 401 行 —— 游戏页面中枢：组合全部面板 / 编排状态与事件</text>
+  <line x1="593" y1="523" x2="593" y2="650" stroke="#e6dcc8" stroke-width="1"/>
+  <line x1="1066" y1="523" x2="1066" y2="650" stroke="#e6dcc8" stroke-width="1"/>
+
+  <text class="ct" x="140" y="550">◆ 状态编排</text>
+  <text class="bl" x="140" y="574">activePanel: wheel / handbook / garden</text>
+  <text class="bl" x="140" y="592">  / handcraft / visitors / settings</text>
+  <text class="bl" x="140" y="610">showDetail · activeGame · showStamp</text>
+  <text class="bs" x="140" y="630">单页多面板，无路由级页面切换</text>
+
+  <text class="ct" x="613" y="550">◆ 事件回调</text>
+  <text class="bl" x="613" y="574">handleSelectTerm → 切换节气，延迟 300ms</text>
+  <text class="bl" x="613" y="592">  自动解锁物候 / 花卉 / 访客 + toast</text>
+  <text class="bl" x="613" y="610">handleToggleActivity → 完成 +10 岁时值</text>
+  <text class="bl" x="613" y="628">collectFood / Phenology / Craft · reset</text>
+
+  <text class="ct" x="1086" y="550">◆ 场景渲染</text>
+  <text class="bl" x="1086" y="574">庭院场景图（季节渐变 1.2s 过渡）</text>
+  <text class="bl" x="1086" y="592">ParticleLayer 粒子 · TermTimeline 时间轴</text>
+  <text class="bl" x="1086" y="610">6×ScrollPanel 卷轴面板</text>
+  <text class="bl" x="1086" y="628">SolarWheel · ActivityGame · SealStamp</text>
+
+  <!-- ③→④ -->
+  <line x1="320" y1="650" x2="320" y2="770" stroke="#6b6258" stroke-width="2" marker-end="url(#arwSolid)"/>
+  <line x1="810" y1="650" x2="810" y2="770" stroke="#6b6258" stroke-width="2" marker-end="url(#arwSolid)"/>
+  <line x1="1300" y1="650" x2="1300" y2="770" stroke="#6b6258" stroke-width="2" marker-end="url(#arwSolid)"/>
+
+  <!-- ================= ④ 业务组件层 ================= -->
+  <rect class="band" x="40" y="720" width="1520" height="290" rx="14"/>
+  <rect class="chip" x="52" y="736" width="200" height="34" fill="#3f6c8c"/>
+  <text class="lbl" x="152" y="759" text-anchor="middle">④ 业务组件层（14 个）</text>
+
+  <!-- D1 常驻场景 -->
+  <rect class="gbox" x="90" y="770" width="460" height="210" rx="12" fill="#f4f8fa" stroke="#c3d4e0"/>
+  <text class="gtt" x="110" y="797" fill="#3f6c8c">常驻场景组件</text>
+  <rect class="box" x="110" y="810" width="200" height="72" rx="8"/>
+  <text class="bt2" x="210" y="832" text-anchor="middle">StatusBar</text>
+  <text class="bl2" x="210" y="853" text-anchor="middle">节气 / 天气 / 岁时值</text>
+  <text class="bs" x="210" y="869" text-anchor="middle">季节主题色适配</text>
+  <rect class="box" x="330" y="810" width="200" height="72" rx="8"/>
+  <text class="bt2" x="430" y="832" text-anchor="middle">ParticleLayer</text>
+  <text class="bl2" x="430" y="853" text-anchor="middle">四季飘落粒子</text>
+  <text class="bs" x="430" y="869" text-anchor="middle">花·萤·叶·雪（CSS）</text>
+  <rect class="box" x="110" y="902" width="200" height="72" rx="8"/>
+  <text class="bt2" x="210" y="924" text-anchor="middle">TermTimeline</text>
+  <text class="bl2" x="210" y="945" text-anchor="middle">24 节气横向时间轴</text>
+  <text class="bs" x="210" y="961" text-anchor="middle">点击切换节气</text>
+  <rect class="box" x="330" y="902" width="200" height="72" rx="8"/>
+  <text class="bt2" x="430" y="924" text-anchor="middle">SealButtons</text>
+  <text class="bl2" x="430" y="945" text-anchor="middle">右侧印章按钮组</text>
+  <text class="bs" x="430" y="961" text-anchor="middle">6 个面板入口</text>
+
+  <!-- D2 卷轴面板 -->
+  <rect class="gbox" x="580" y="770" width="460" height="210" rx="12" fill="#f6f4ee" stroke="#d8cdb4"/>
+  <text class="gtt" x="600" y="797" fill="#6b6258">卷轴面板 ×6（ScrollPanel 容器）</text>
+  <rect class="box" x="600" y="810" width="132" height="58" rx="6"/>
+  <text x="666" y="832" text-anchor="middle" font-size="12px" font-weight="700" fill="#3d3a33">TermDetailPanel</text>
+  <text class="bs" x="666" y="850" text-anchor="middle">节气详情·活动·美食</text>
+  <rect class="box" x="746" y="810" width="132" height="58" rx="6"/>
+  <text x="812" y="832" text-anchor="middle" font-size="12px" font-weight="700" fill="#3d3a33">HandbookPanel</text>
+  <text class="bs" x="812" y="850" text-anchor="middle">风物志图鉴</text>
+  <rect class="box" x="892" y="810" width="132" height="58" rx="6"/>
+  <text x="958" y="832" text-anchor="middle" font-size="12px" font-weight="700" fill="#3d3a33">VisitorsPanel</text>
+  <text class="bs" x="958" y="850" text-anchor="middle">山中访客</text>
+  <rect class="box" x="600" y="886" width="132" height="58" rx="6"/>
+  <text x="666" y="908" text-anchor="middle" font-size="12px" font-weight="700" fill="#3d3a33">GardenPanel</text>
+  <text class="bs" x="666" y="926" text-anchor="middle">庭院布置</text>
+  <rect class="box" x="746" y="886" width="132" height="58" rx="6"/>
+  <text x="812" y="908" text-anchor="middle" font-size="12px" font-weight="700" fill="#3d3a33">HandcraftPanel</text>
+  <text class="bs" x="812" y="926" text-anchor="middle">手作工坊</text>
+  <rect class="box" x="892" y="886" width="132" height="58" rx="6"/>
+  <text x="958" y="908" text-anchor="middle" font-size="12px" font-weight="700" fill="#3d3a33">SettingsPanel</text>
+  <text class="bs" x="958" y="926" text-anchor="middle">设置·重置</text>
+  <rect x="600" y="958" width="420" height="22" rx="4" fill="#ece5d5"/>
+  <text x="612" y="973" font-size="11px" fill="#5a554a">ScrollPanel.tsx 卷轴容器（right / center · 滑入动画）</text>
+
+  <!-- D3 交互与特效 -->
+  <rect class="gbox" x="1070" y="770" width="460" height="210" rx="12" fill="#f6f1ea" stroke="#e0d3bd"/>
+  <text class="gtt" x="1090" y="797" fill="#8a6d3b">交互与特效</text>
+  <rect class="box" x="1090" y="810" width="420" height="48" rx="8"/>
+  <text class="bt2" x="1300" y="833" text-anchor="middle">SolarWheel · 24 节气轮盘</text>
+  <text class="bl2" x="1300" y="851" text-anchor="middle">旋转定位 · 四季分段着色 · 确认切换</text>
+  <rect class="box" x="1090" y="870" width="420" height="48" rx="8"/>
+  <text class="bt2" x="1300" y="893" text-anchor="middle">ActivityGame · 互动小游戏</text>
+  <text class="bl2" x="1300" y="911" text-anchor="middle">点击收集 / 顺序点击 · 完成领奖 +10</text>
+  <rect class="box" x="1090" y="930" width="420" height="48" rx="8"/>
+  <text class="bt2" x="1300" y="953" text-anchor="middle">SealStamp · 盖章动画</text>
+  <text class="bl2" x="1300" y="971" text-anchor="middle">朱砂印章盖下 · 完成 / 收集反馈</text>
+
+  <!-- ④→⑤ 数据读写 -->
+  <line x1="320" y1="980" x2="320" y2="1110" stroke="#8a6d3b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arwDash)"/>
+  <line x1="810" y1="980" x2="810" y2="1110" stroke="#8a6d3b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arwDash)"/>
+  <line x1="1300" y1="980" x2="1300" y2="1110" stroke="#8a6d3b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arwDash)"/>
+  <text class="note" x="295" y="1088">读写进度</text>
+  <text class="note" x="810" y="1088" text-anchor="middle">读取 mock 数据</text>
+  <text class="note" x="1275" y="1088">引用 lib 定义</text>
+
+  <!-- ================= ⑤ 状态 / 数据 / 逻辑层 ================= -->
+  <rect class="band" x="40" y="1060" width="1520" height="250" rx="14"/>
+  <rect class="chip" x="52" y="1076" width="200" height="34" fill="#4a7c59"/>
+  <text class="lbl" x="152" y="1099" text-anchor="middle">⑤ 状态 / 数据 / 逻辑层</text>
+
+  <!-- E1 hooks -->
+  <rect class="gbox" x="90" y="1110" width="460" height="176" rx="12" fill="#eef4ee" stroke="#c3d6c3"/>
+  <text class="gtt" x="110" y="1137" fill="#4a7c59">hooks/ · 游戏进度状态中枢</text>
+  <rect class="box" x="110" y="1150" width="420" height="112" rx="8"/>
+  <text class="bt2" x="130" y="1172">useGameProgress.ts</text>
+  <text class="bl2" x="130" y="1190">IGameProgress：12 字段（岁时值 / 收集×6 /</text>
+  <text class="bl2" x="130" y="1206">访客 / 装饰 / 评分 / 当前节气）</text>
+  <text class="bl2" x="130" y="1222">操作 ×12：completeActivity / collect* /</text>
+  <text class="bl2" x="130" y="1238">meetVisitor / setCurrentTerm / setDecoration</text>
+  <text class="bl2" x="130" y="1254">持久化：scopedStorage → localStorage</text>
+  <text class="bs" x="110" y="1278">use-mobile.ts · useIsMobile（移动端检测）</text>
+
+  <!-- E2 data -->
+  <rect class="gbox" x="580" y="1110" width="460" height="176" rx="12" fill="#f4f4ee" stroke="#d8d8c3"/>
+  <text class="gtt" x="600" y="1137" fill="#4a7c59">data/ · 内置 mock 数据（无后端）</text>
+  <rect class="box" x="600" y="1150" width="420" height="64" rx="8"/>
+  <text class="bt2" x="620" y="1172">solarTerms.ts ★ 核心数据</text>
+  <text class="bl2" x="620" y="1190">24 节气 × 三候 × 活动 × 美食 × 访客 × 作物</text>
+  <text class="bl2" x="620" y="1206">节气名 / 日期 / 季节 / 诗词 / 天气</text>
+  <rect x="600" y="1226" width="98" height="24" rx="4" fill="#e8ece2"/>
+  <text class="bs" x="649" y="1242" text-anchor="middle">visitors.ts</text>
+  <rect x="706" y="1226" width="98" height="24" rx="4" fill="#e8ece2"/>
+  <text class="bs" x="755" y="1242" text-anchor="middle">flowers.ts</text>
+  <rect x="812" y="1226" width="98" height="24" rx="4" fill="#e8ece2"/>
+  <text class="bs" x="861" y="1242" text-anchor="middle">decorations.ts</text>
+  <rect x="918" y="1226" width="98" height="24" rx="4" fill="#e8ece2"/>
+  <text class="bs" x="967" y="1242" text-anchor="middle">handcrafts.ts</text>
+  <text class="bs" x="600" y="1278">※ 节气美食 / 作物已内嵌于 solarTerms.ts（单一来源）</text>
+
+  <!-- E3 lib -->
+  <rect class="gbox" x="1070" y="1110" width="460" height="176" rx="12" fill="#f4f2ee" stroke="#e0d8c8"/>
+  <text class="gtt" x="1090" y="1137" fill="#8a6d3b">lib/ · 工具与定义</text>
+  <rect class="box" x="1090" y="1150" width="200" height="58" rx="8"/>
+  <text class="bt2" x="1190" y="1173" text-anchor="middle">season-images.ts</text>
+  <text class="bs" x="1190" y="1193" text-anchor="middle">庭院图 / 角色图 URL</text>
+  <rect class="box" x="1300" y="1150" width="200" height="58" rx="8"/>
+  <text class="bt2" x="1400" y="1173" text-anchor="middle">utils.ts</text>
+  <text class="bs" x="1400" y="1193" text-anchor="middle">cn() 类名合并</text>
+  <text class="bs" x="1090" y="1245">※ 已移除未接入模块 activity-defs / season-palette</text>
+
+  <!-- ⑤→⑥ -->
+  <line x1="320" y1="1286" x2="320" y2="1420" stroke="#8a6d3b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arwDash)"/>
+  <line x1="810" y1="1286" x2="810" y2="1420" stroke="#8a6d3b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arwDash)"/>
+  <line x1="1300" y1="1286" x2="1300" y2="1420" stroke="#8a6d3b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arwDash)"/>
+
+  <!-- ================= ⑥ 基础支撑层 ================= -->
+  <rect class="band" x="40" y="1370" width="1520" height="180" rx="14"/>
+  <rect class="chip" x="52" y="1386" width="230" height="34" fill="#8a6d3b"/>
+  <text class="lbl" x="167" y="1409" text-anchor="middle">⑥ 基础 UI / 主题 / 外部依赖</text>
+
+  <rect class="gbox" x="90" y="1420" width="460" height="105" rx="12" fill="#f6f6f7" stroke="#d8d8dd"/>
+  <text class="gtt" x="110" y="1447" fill="#6b7280">components/ui/ · shadcn/ui ×55</text>
+  <text class="bl2" x="110" y="1469">button / dialog / sheet / select / tabs</text>
+  <text class="bl2" x="110" y="1487">accordion / form / chart / …（Radix 封装）</text>
+  <text class="bs" x="110" y="1507">被业务组件 import（禁止业务逻辑）</text>
+
+  <rect class="gbox" x="580" y="1420" width="460" height="105" rx="12" fill="#f6f3ec" stroke="#ddd3bf"/>
+  <text class="gtt" x="600" y="1447" fill="#8a6d3b">样式 / 主题体系</text>
+  <text class="bl2" x="600" y="1469">index.css → tailwind-theme.css</text>
+  <text class="bl2" x="600" y="1487">9 个 CSS token + 四季语义色 + 书法排版</text>
+  <text class="bs" x="600" y="1507">bg-background / text-primary / border-border</text>
+
+  <rect class="gbox" x="1070" y="1420" width="460" height="105" rx="12" fill="#f4f6f8" stroke="#d3dce4"/>
+  <text class="gtt" x="1090" y="1447" fill="#3f6c8c">外部依赖（package.json）</text>
+  <text class="bl2" x="1090" y="1469">React 19 · Vite 8 · Tailwind v4</text>
+  <text class="bl2" x="1090" y="1487">framer-motion · lucide · RRD 7 · sonner</text>
+  <text class="bs" x="1090" y="1507">client-toolkit-lite · Radix · error-boundary</text>
+
+  <!-- 底部说明 -->
+  <text class="foot" x="800" y="1560" text-anchor="middle">数据流闭环：用户交互 → HomePage 事件回调 → useGameProgress（setState）→ localStorage 持久化 → 各面板订阅 re-render</text>
+  <text class="foot" x="800" y="1580" text-anchor="middle">已修复：清理未接入模块与冗余依赖（gsap / react-markdown / date-fns 等）；补齐 scripts/（dev.mjs / build.mjs / setup-git-hooks.mjs），npm run dev / build 已可用</text>
+</svg>
+</body>
+</html>
