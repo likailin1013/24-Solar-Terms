@@ -37,10 +37,34 @@ const weatherIconMap: Record<string, typeof Sun> = {
   '大寒岁末': Wind,
 };
 
+// 等级里程碑（设计文档 1.3）
+const LEVEL_MILESTONES: { lv: number; label: string }[] = [
+  { lv: 1, label: '菜畦·茶亭' },
+  { lv: 4, label: '花圃·池塘' },
+  { lv: 7, label: '小溪·石桥' },
+  { lv: 10, label: '梅林·茶室' },
+  { lv: 13, label: '岁终团圆' },
+];
+
+/** 岁时值 → 等级（每 60 点升一级） */
+function getLevel(yearValue: number): number {
+  return Math.floor(yearValue / 60) + 1;
+}
+
+function getMilestone(level: number): string {
+  let label = '菜畦·茶亭';
+  for (const m of LEVEL_MILESTONES) {
+    if (level >= m.lv) label = m.label;
+  }
+  return label;
+}
+
 export default function StatusBar({ term, yearValue, maxYearValue = 240 }: StatusBarProps) {
   const seasonColors = SEASON_COLORS[term.season];
   const WeatherIcon = weatherIconMap[term.weather] ?? Sun;
   const progressPct = Math.min((yearValue / maxYearValue) * 100, 100);
+  const level = getLevel(yearValue);
+  const milestone = getMilestone(level);
 
   return (
     <div
@@ -92,6 +116,10 @@ export default function StatusBar({ term, yearValue, maxYearValue = 240 }: Statu
               <span className="text-sm font-bold font-serif" style={{ color: seasonColors.text }}>
                 {yearValue}
               </span>
+            </div>
+            {/* 等级里程碑 */}
+            <div className="text-[10px] font-serif text-muted-foreground/80 mt-0.5 whitespace-nowrap">
+              Lv{level} · {milestone}
             </div>
             {/* 进度条 */}
             <div className="w-20 md:w-28 h-1.5 bg-muted/60 rounded-full overflow-hidden mt-0.5">

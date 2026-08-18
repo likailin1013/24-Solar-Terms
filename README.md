@@ -7,7 +7,7 @@
 | 类别 | 选型 |
 |---|---|
 | 框架 | React 19 + TypeScript 5.9 |
-| 构建 | Vite 8（`@lark-apaas/coding-preset-vite-react`） |
+| 构建 | Vite 8（原生配置：@vitejs/plugin-react + @tailwindcss/vite） |
 | 样式 | Tailwind CSS v4 + 自定义主题变量 |
 | 路由 | react-router-dom 7（BrowserRouter） |
 | 动画 | framer-motion + CSS keyframes |
@@ -49,7 +49,7 @@ npm run precommit  # 提交门禁（= npm run lint）
     ├── hooks/
     │   ├── useGameProgress.ts # 游戏进度状态中枢（localStorage 持久化）
     │   └── use-mobile.ts
-    ├── data/                  # 内置 mock 数据（solarTerms / visitors / flowers / decorations / handcrafts）
+    ├── data/                  # 内置 mock 数据（solarTerms / crops / items / visitors / flowers / decorations / handcrafts）
     └── lib/                   # 工具（season-images / utils）
 ```
 
@@ -57,28 +57,32 @@ npm run precommit  # 提交门禁（= npm run lint）
 
 | 分组 | 组件 | 职责 |
 |---|---|---|
-| 常驻场景 | `StatusBar` | 顶部状态栏：节气 / 天气 / 岁时值进度 |
+| 常驻场景 | `StatusBar` | 顶部状态栏：节气 / 天气 / 岁时值进度 / 等级里程碑 |
 | 常驻场景 | `ParticleLayer` | 四季飘落粒子（花·萤·叶·雪） |
 | 常驻场景 | `TermTimeline` | 24 节气时间轴，点击切换 |
 | 常驻场景 | `SealButtons` | 右侧印章按钮组（面板入口） |
 | 卷轴容器 | `ScrollPanel` | 卷轴式抽屉/弹窗容器 |
 | 面板 | `TermDetailPanel` | 节气详情：活动 / 食膳 / 物候 |
-| 面板 | `HandbookPanel` | 风物志图鉴（物候 / 食膳 / 器物 / 花卉） |
-| 面板 | `VisitorsPanel` | 山中访客（已遇 / 未遇） |
-| 面板 | `GardenPanel` | 庭院布置 |
-| 面板 | `HandcraftPanel` | 手作工坊 |
+| 面板 | `HandbookPanel` | 风物志图鉴（物候 / 食膳 / 器物 / 花卉）+ 节气印章 / 四季徽章 / 称号 |
+| 面板 | `VisitorsPanel` | 山中访客：已遇 / 未遇 / 选择式对话 / 好感度 / 赠礼（入背包） |
+| 面板 | `GardenPanel` | 庭院布置（装饰物 + 美观度）与菜畦种植（三阶段生长 / 收获入背包） |
+| 面板 | `HandcraftPanel` | 手作工坊：25 种器物，制作需消耗背包材料（配方显示库存 / 缺料禁用） |
+| 面板 | `BackpackPanel` | 背包：作物收成 / 基础材料 / 加工制品 / 访客赠礼，按分类展示数量与来源 |
 | 面板 | `SettingsPanel` | 设置 / 重置进度 |
 | 交互特效 | `SolarWheel` | 24 节气轮盘 |
-| 交互特效 | `ActivityGame` | 互动小游戏（点击收集 / 顺序点击） |
+| 交互特效 | `ActivityGame` | 互动小游戏：点击收集 / 分步制作 / 拖拽匹配（覆盖全部 68 项节气活动） |
 | 交互特效 | `SealStamp` | 盖章动画 |
 
 ## 数据与持久化
 
 - **游戏内容**：全部为内置 mock 常量，无后端 ——
   - 24 节气（含三候 / 活动 / 食膳 / 作物）与四季色板：`src/data/solarTerms.ts`
+  - 节气作物（可种植 / 生长 / 产出）：`src/data/crops.ts`
+  - 背包物品表（作物收成 / 基础材料 / 加工制品 / 访客赠礼）：`src/data/items.ts`
   - 访客：`src/data/visitors.ts`；花卉：`src/data/flowers.ts`
-  - 装饰物：`src/data/decorations.ts`；手作器物：`src/data/handcrafts.ts`
-- **玩家进度**：`src/hooks/useGameProgress.ts` 为唯一状态源（12 字段 × 12 操作），直接通过浏览器 `localStorage` 持久化，key = `__game_suishiji_progress_v2`
+  - 装饰物：`src/data/decorations.ts`；手作器物与配方：`src/data/handcrafts.ts`
+- **玩家进度**：`src/hooks/useGameProgress.ts` 为唯一状态源（14 字段 × 17 操作：活动 / 物候 / 食膳 / 作物 / 花卉 / 器物 / 访客 / 装饰 / 种植 / 好感度 / 背包库存等），直接通过浏览器 `localStorage` 持久化，key = `__game_suishiji_progress_v2`
+- **背包与手作材料链**：种植收获（如水稻→稻米+稻草）、节气活动收集、访客赠礼三条渠道获取物品入背包；手作合成消耗背包材料（黄麻×3→麻绳、枫桦木×2→木楦，稻草+黄麻+麻绳+木楦→编草鞋）
 - **图片资源**：四季庭院 / 角色图为本地 SVG（`public/images/`），URL 配置于 `src/lib/season-images.ts`
 
 ## 路由配置

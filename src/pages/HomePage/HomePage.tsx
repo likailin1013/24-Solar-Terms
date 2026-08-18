@@ -5,6 +5,7 @@ import { useGameProgress } from '@/hooks/useGameProgress';
 import { getSeasonImage, CHARACTER_IMAGE } from '@/lib/season-images';
 import { MOCK_VISITORS } from '@/data/visitors';
 import { MOCK_FLOWERS } from '@/data/flowers';
+import { getCropById } from '@/data/crops';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +19,7 @@ import VisitorsPanel from '@/components/VisitorsPanel';
 import ActivityGame from '@/components/ActivityGame';
 import GardenPanel from '@/components/GardenPanel';
 import HandcraftPanel from '@/components/HandcraftPanel';
+import BackpackPanel from '@/components/BackpackPanel';
 import SettingsPanel from '@/components/SettingsPanel';
 import StatusBar from '@/components/StatusBar';
 import SealButtons, { type PanelType } from '@/components/SealButtons';
@@ -32,10 +34,14 @@ export default function HomePage() {
     collectPhenology,
     collectFood,
     collectFlower,
-    collectArtifact,
     meetVisitor,
     setCurrentTerm,
     setDecoration,
+    plantCrop,
+    harvestCrop,
+    boostAffinity,
+    craftHandcraft,
+    grantVisitorGift,
     resetProgress,
   } = useGameProgress();
 
@@ -56,6 +62,29 @@ export default function HomePage() {
   const [showDetail, setShowDetail] = useState(false);
   const [showStamp, setShowStamp] = useState(false);
   const [stampText, setStampText] = useState('岁时记');
+  // 庭院面板初始标签（由庭院热区切换）
+  const [gardenTab, setGardenTab] = useState<'decorate' | 'plant'>('decorate');
+
+  // 打开庭院面板并指定标签
+  const handleOpenGarden = useCallback((tab: 'decorate' | 'plant') => {
+    setGardenTab(tab);
+    setActivePanel('garden');
+    setShowDetail(false);
+  }, []);
+
+  // 收获作物（提示文案由当前进度构建）
+  const handleHarvest = useCallback((plotId: string) => {
+    const planted = progress.crops[plotId];
+    const crop = planted ? getCropById(planted.cropId) : undefined;
+    harvestCrop(plotId);
+    if (crop) {
+      const parts = crop.yields.map((y) => `${y.name}×${y.count}`).join('、');
+      toast.success(`收获 ${crop.name}：${parts}，岁时值 +${crop.yields.length * 3}`);
+      setStampText('收获');
+      setShowStamp(true);
+      setTimeout(() => setShowStamp(false), 1200);
+    }
+  }, [harvestCrop, progress.crops]);
 
   // 活动小游戏状态
   const [activeGame, setActiveGame] = useState<{ id: string; name: string; icon: string } | null>(null);
@@ -131,13 +160,16 @@ export default function HomePage() {
   }, [collectPhenology, currentTerm, progress.collectedPhenology]);
 
   const handleCraft = useCallback((artifactId: string) => {
-    if (progress.collectedArtifacts.includes(artifactId)) return;
-    collectArtifact(artifactId);
+    const ok = craftHandcraft(artifactId);
+    if (!ok) {
+      toast.error('背包材料不足，无法制作');
+      return;
+    }
     setStampText('手作');
     setShowStamp(true);
     toast.success('制作完成，岁时值 +8');
     setTimeout(() => setShowStamp(false), 1200);
-  }, [collectArtifact, progress.collectedArtifacts]);
+  }, [craftHandcraft]);
 
   const handleReset = useCallback(() => {
     if (confirm('确定要重置所有游戏进度吗？此操作不可撤销。')) {
@@ -227,8 +259,7 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.2 }}
-            className="relative rounded-sm overflow-hidden border border-border/50 shadow-xl mb-6"
-            style={{ aspectRatio: '16/9' }}
+            className="relative rounded-sm overflow-hidden border border-border/50 shadow-xl mb-6 aspect-[4/3] sm:aspect-[16/9]"
           >
             <Image
               src={getSeasonImage(currentTerm.season)}
@@ -238,6 +269,28 @@ export default function HomePage() {
 
             {/* 渐变蒙层 */}
             <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-background/10" />
+
+            {/* 庭院可交互热区：点击打开对应面板 */}
+            <div className="absolute inset-0 z-10 pointer-events-none">
+              {([
+                { id: 'caiqi', icon: '🥬', label: '菜畦·种植', left: '20%', top: '72%', onClick: () => handleOpenGarden('plant') },
+                { id: 'huapu', icon: '🌸', label: '花圃·风物', left: '38%', top: '56%', onClick: () => setActivePanel('handbook') },
+                { id: 'chitang', icon: '🪷', label: '池塘', left: '63%', top: '74%', onClick: () => setShowDetail(true) },
+                { id: 'chating', icon: '🏯', label: '茶亭·时令', left: '81%', top: '40%', onClick: () => setShowDetail(true) },
+              ] as { id: string; icon: string; label: string; left: string; top: string; onClick: () => void }[]).map((zone) => (
+                <motion.button
+                  key={zone.id}
+                  whileHover={{ scale: 1.12 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={zone.onClick}
+                  className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 px-2 py-1 rounded-full bg-card/80 backdrop-blur-sm border border-border/60 text-xs font-serif text-foreground shadow-sm hover:border-primary/60 hover:bg-card transition-all"
+                  style={{ left: zone.left, top: zone.top }}
+                >
+                  <span>{zone.icon}</span>
+                  <span className="hidden sm:inline">{zone.label}</span>
+                </motion.button>
+              ))}
+            </div>
 
             {/* 节气信息（左上） */}
             <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
@@ -386,7 +439,15 @@ export default function HomePage() {
         subtitle="一方小院 四时清欢"
         side="right"
       >
-        <GardenPanel progress={progress} currentTerm={currentTerm} onSetDecoration={setDecoration} />
+        <GardenPanel
+          key={gardenTab}
+          progress={progress}
+          currentTerm={currentTerm}
+          onSetDecoration={setDecoration}
+          onPlant={plantCrop}
+          onHarvest={handleHarvest}
+          initialTab={gardenTab}
+        />
       </ScrollPanel>
 
       {/* 手作面板 */}
@@ -394,10 +455,21 @@ export default function HomePage() {
         open={activePanel === 'handcraft'}
         onClose={() => setActivePanel(null)}
         title="手作工坊"
-        subtitle="亲手制作器物"
+        subtitle="以背包之物，制四时器物"
         side="right"
       >
         <HandcraftPanel progress={progress} onCraft={handleCraft} />
+      </ScrollPanel>
+
+      {/* 背包面板 */}
+      <ScrollPanel
+        open={activePanel === 'backpack'}
+        onClose={() => setActivePanel(null)}
+        title="背包"
+        subtitle="行囊所载，皆四时风物"
+        side="right"
+      >
+        <BackpackPanel progress={progress} />
       </ScrollPanel>
 
       {/* 访客面板 */}
@@ -408,7 +480,7 @@ export default function HomePage() {
         subtitle="往来无白丁"
         side="right"
       >
-        <VisitorsPanel progress={progress} />
+        <VisitorsPanel progress={progress} onBoostAffinity={boostAffinity} onGift={grantVisitorGift} />
       </ScrollPanel>
 
       {/* 设置面板 */}
@@ -439,8 +511,8 @@ export default function HomePage() {
       {/* 盖章动画 */}
       <SealStamp show={showStamp} text={stampText} />
 
-      {/* 底部装饰线 */}
-      <div className="relative z-10 pt-4 pb-6 text-center">
+      {/* 底部装饰线（移动端为底部按钮栏留白） */}
+      <div className="relative z-10 pt-4 pb-24 md:pb-6 text-center">
         <div className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-border to-transparent mb-3" />
         <p className="text-xs text-muted-foreground font-serif tracking-widest">
           岁时记 · 二十四节气

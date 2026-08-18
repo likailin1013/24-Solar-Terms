@@ -38,6 +38,18 @@ export default function HandbookPanel({ progress }: HandbookPanelProps) {
     ? Math.round((currentStats.collected / currentStats.total) * 100)
     : 0;
 
+  // 收集奖励（设计文档 6.2）：节气印章 / 四季徽章 / 称号
+  const termSealCount = MOCK_SOLAR_TERMS.filter((t) =>
+    t.phenology.every((_, i) => progress.collectedPhenology.includes(`${t.id}-${i}`)),
+  ).length;
+  const seasonBadgeCount = (['spring', 'summer', 'autumn', 'winter'] as const).filter((s) => {
+    const terms = MOCK_SOLAR_TERMS.filter((t) => t.season === s);
+    return terms.length > 0 && terms.every((t) =>
+      t.phenology.every((_, i) => progress.collectedPhenology.includes(`${t.id}-${i}`)),
+    );
+  }).length;
+  const zhiTianMing = progress.collectedPhenology.length >= stats.phenology.total;
+
   return (
     <div className="space-y-5">
       {/* 收集进度 */}
@@ -58,6 +70,34 @@ export default function HandbookPanel({ progress }: HandbookPanelProps) {
         </div>
         <p className="text-xs text-muted-foreground mt-2">{progressPct}% 已收录</p>
       </div>
+
+      {/* 收集奖励 */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="p-2.5 rounded-sm border border-border/60 bg-card text-center">
+          <div className="text-lg mb-0.5">🏮</div>
+          <p className="text-xs font-serif text-foreground">节气印章</p>
+          <p className={cn('text-sm font-serif', termSealCount >= 24 ? 'text-primary' : 'text-muted-foreground')}>
+            {termSealCount} / 24
+          </p>
+        </div>
+        <div className="p-2.5 rounded-sm border border-border/60 bg-card text-center">
+          <div className="text-lg mb-0.5">🪙</div>
+          <p className="text-xs font-serif text-foreground">四季徽章</p>
+          <p className={cn('text-sm font-serif', seasonBadgeCount >= 4 ? 'text-primary' : 'text-muted-foreground')}>
+            {seasonBadgeCount} / 4
+          </p>
+        </div>
+        <div className={cn('p-2.5 rounded-sm border text-center transition-all', zhiTianMing ? 'border-amber-400/60 bg-amber-50' : 'border-border/60 bg-card')}>
+          <div className="text-lg mb-0.5">🏅</div>
+          <p className="text-xs font-serif text-foreground">称号</p>
+          <p className={cn('text-sm font-serif', zhiTianMing ? 'text-amber-700' : 'text-muted-foreground')}>
+            {zhiTianMing ? '知天命' : '待君寻访'}
+          </p>
+        </div>
+      </div>
+      <p className="text-[10px] text-muted-foreground font-serif -mt-1">
+        集齐某节气三候得节气印章 · 集齐某季六枚印章得四季徽章 · 集齐全部 72 候得称号"知天命"
+      </p>
 
       {/* 标签页 */}
       <div className="flex gap-1 border-b border-border/50">

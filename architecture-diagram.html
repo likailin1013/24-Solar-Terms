@@ -72,11 +72,11 @@
   <rect class="box" x="830" y="188" width="330" height="70" rx="8" stroke="#b13a2b" stroke-width="1.8" fill="#fdf3f0"/>
   <text x="995" y="214" text-anchor="middle" font-size="14.5px" font-weight="700" fill="#b13a2b">src/index.tsx 入口</text>
   <text class="bl" x="995" y="235" text-anchor="middle">createRoot → &lt;BrowserRouter&gt;</text>
-  <text class="bl" x="995" y="253" text-anchor="middle">&lt;AppContainer&gt; → &lt;ErrorBoundary&gt; → App</text>
+  <text class="bl" x="995" y="253" text-anchor="middle">&lt;ErrorBoundary&gt;（自绘兜底页）→ App</text>
 
   <text class="note" x="1215" y="216">React 19 · StrictMode</text>
   <text class="note" x="1215" y="238">react-error-boundary 兜底</text>
-  <text class="note" x="1215" y="260">@lark-apaas 容器 / logger</text>
+  <text class="note" x="1215" y="260">无平台依赖 · 原生 localStorage</text>
 
   <!-- ①→② -->
   <line x1="995" y1="258" x2="995" y2="300" stroke="#6b6258" stroke-width="2" marker-end="url(#arwSolid)"/>
@@ -143,15 +143,15 @@
   <!-- ================= ④ 业务组件层 ================= -->
   <rect class="band" x="40" y="720" width="1520" height="290" rx="14"/>
   <rect class="chip" x="52" y="736" width="200" height="34" fill="#3f6c8c"/>
-  <text class="lbl" x="152" y="759" text-anchor="middle">④ 业务组件层（14 个）</text>
+  <text class="lbl" x="152" y="759" text-anchor="middle">④ 业务组件层（15 个）</text>
 
   <!-- D1 常驻场景 -->
   <rect class="gbox" x="90" y="770" width="460" height="210" rx="12" fill="#f4f8fa" stroke="#c3d4e0"/>
   <text class="gtt" x="110" y="797" fill="#3f6c8c">常驻场景组件</text>
   <rect class="box" x="110" y="810" width="200" height="72" rx="8"/>
   <text class="bt2" x="210" y="832" text-anchor="middle">StatusBar</text>
-  <text class="bl2" x="210" y="853" text-anchor="middle">节气 / 天气 / 岁时值</text>
-  <text class="bs" x="210" y="869" text-anchor="middle">季节主题色适配</text>
+  <text class="bl2" x="210" y="853" text-anchor="middle">节气/天气/岁时值</text>
+  <text class="bs" x="210" y="869" text-anchor="middle">等级里程碑·季节适配</text>
   <rect class="box" x="330" y="810" width="200" height="72" rx="8"/>
   <text class="bt2" x="430" y="832" text-anchor="middle">ParticleLayer</text>
   <text class="bl2" x="430" y="853" text-anchor="middle">四季飘落粒子</text>
@@ -167,27 +167,30 @@
 
   <!-- D2 卷轴面板 -->
   <rect class="gbox" x="580" y="770" width="460" height="210" rx="12" fill="#f6f4ee" stroke="#d8cdb4"/>
-  <text class="gtt" x="600" y="797" fill="#6b6258">卷轴面板 ×6（ScrollPanel 容器）</text>
-  <rect class="box" x="600" y="810" width="132" height="58" rx="6"/>
-  <text x="666" y="832" text-anchor="middle" font-size="12px" font-weight="700" fill="#3d3a33">TermDetailPanel</text>
-  <text class="bs" x="666" y="850" text-anchor="middle">节气详情·活动·美食</text>
-  <rect class="box" x="746" y="810" width="132" height="58" rx="6"/>
-  <text x="812" y="832" text-anchor="middle" font-size="12px" font-weight="700" fill="#3d3a33">HandbookPanel</text>
-  <text class="bs" x="812" y="850" text-anchor="middle">风物志图鉴</text>
-  <rect class="box" x="892" y="810" width="132" height="58" rx="6"/>
-  <text x="958" y="832" text-anchor="middle" font-size="12px" font-weight="700" fill="#3d3a33">VisitorsPanel</text>
-  <text class="bs" x="958" y="850" text-anchor="middle">山中访客</text>
-  <rect class="box" x="600" y="886" width="132" height="58" rx="6"/>
-  <text x="666" y="908" text-anchor="middle" font-size="12px" font-weight="700" fill="#3d3a33">GardenPanel</text>
-  <text class="bs" x="666" y="926" text-anchor="middle">庭院布置</text>
-  <rect class="box" x="746" y="886" width="132" height="58" rx="6"/>
-  <text x="812" y="908" text-anchor="middle" font-size="12px" font-weight="700" fill="#3d3a33">HandcraftPanel</text>
-  <text class="bs" x="812" y="926" text-anchor="middle">手作工坊</text>
-  <rect class="box" x="892" y="886" width="132" height="58" rx="6"/>
-  <text x="958" y="908" text-anchor="middle" font-size="12px" font-weight="700" fill="#3d3a33">SettingsPanel</text>
-  <text class="bs" x="958" y="926" text-anchor="middle">设置·重置</text>
-  <rect x="600" y="958" width="420" height="22" rx="4" fill="#ece5d5"/>
-  <text x="612" y="973" font-size="11px" fill="#5a554a">ScrollPanel.tsx 卷轴容器（right / center · 滑入动画）</text>
+  <text class="gtt" x="600" y="797" fill="#6b6258">卷轴面板 ×7（ScrollPanel 容器）</text>
+  <rect class="box" x="600" y="805" width="128" height="50" rx="6"/>
+  <text x="664" y="825" text-anchor="middle" font-size="11.5px" font-weight="700" fill="#3d3a33">TermDetailPanel</text>
+  <text class="bs" x="664" y="842" text-anchor="middle">活动·食膳·物候</text>
+  <rect class="box" x="740" y="805" width="128" height="50" rx="6"/>
+  <text x="804" y="825" text-anchor="middle" font-size="11.5px" font-weight="700" fill="#3d3a33">HandbookPanel</text>
+  <text class="bs" x="804" y="842" text-anchor="middle">图鉴·印章·称号</text>
+  <rect class="box" x="880" y="805" width="128" height="50" rx="6"/>
+  <text x="944" y="825" text-anchor="middle" font-size="11.5px" font-weight="700" fill="#3d3a33">VisitorsPanel</text>
+  <text class="bs" x="944" y="842" text-anchor="middle">对话·好感·赠礼</text>
+  <rect class="box" x="600" y="865" width="128" height="50" rx="6"/>
+  <text x="664" y="885" text-anchor="middle" font-size="11.5px" font-weight="700" fill="#3d3a33">GardenPanel</text>
+  <text class="bs" x="664" y="902" text-anchor="middle">布置·种植</text>
+  <rect class="box" x="740" y="865" width="128" height="50" rx="6"/>
+  <text x="804" y="885" text-anchor="middle" font-size="11.5px" font-weight="700" fill="#3d3a33">HandcraftPanel</text>
+  <text class="bs" x="804" y="902" text-anchor="middle">配方·库存消耗</text>
+  <rect class="box" x="880" y="865" width="128" height="50" rx="6"/>
+  <text x="944" y="885" text-anchor="middle" font-size="11.5px" font-weight="700" fill="#3d3a33">SettingsPanel</text>
+  <text class="bs" x="944" y="902" text-anchor="middle">设置·重置</text>
+  <rect class="box" x="600" y="925" width="128" height="50" rx="6"/>
+  <text x="664" y="945" text-anchor="middle" font-size="11.5px" font-weight="700" fill="#3d3a33">BackpackPanel</text>
+  <text class="bs" x="664" y="962" text-anchor="middle">背包·材料链</text>
+  <rect x="740" y="931" width="268" height="26" rx="4" fill="#ece5d5"/>
+  <text x="752" y="948" font-size="11px" fill="#5a554a">ScrollPanel.tsx 卷轴容器（right / center）</text>
 
   <!-- D3 交互与特效 -->
   <rect class="gbox" x="1070" y="770" width="460" height="210" rx="12" fill="#f6f1ea" stroke="#e0d3bd"/>
@@ -196,8 +199,8 @@
   <text class="bt2" x="1300" y="833" text-anchor="middle">SolarWheel · 24 节气轮盘</text>
   <text class="bl2" x="1300" y="851" text-anchor="middle">旋转定位 · 四季分段着色 · 确认切换</text>
   <rect class="box" x="1090" y="870" width="420" height="48" rx="8"/>
-  <text class="bt2" x="1300" y="893" text-anchor="middle">ActivityGame · 互动小游戏</text>
-  <text class="bl2" x="1300" y="911" text-anchor="middle">点击收集 / 顺序点击 · 完成领奖 +10</text>
+  <text class="bt2" x="1300" y="893" text-anchor="middle">ActivityGame · 互动小游戏（68 项配置）</text>
+  <text class="bl2" x="1300" y="911" text-anchor="middle">点击收集 / 分步制作 / 拖拽匹配 · +10</text>
   <rect class="box" x="1090" y="930" width="420" height="48" rx="8"/>
   <text class="bt2" x="1300" y="953" text-anchor="middle">SealStamp · 盖章动画</text>
   <text class="bl2" x="1300" y="971" text-anchor="middle">朱砂印章盖下 · 完成 / 收集反馈</text>
@@ -220,11 +223,11 @@
   <text class="gtt" x="110" y="1137" fill="#4a7c59">hooks/ · 游戏进度状态中枢</text>
   <rect class="box" x="110" y="1150" width="420" height="112" rx="8"/>
   <text class="bt2" x="130" y="1172">useGameProgress.ts</text>
-  <text class="bl2" x="130" y="1190">IGameProgress：12 字段（岁时值 / 收集×6 /</text>
-  <text class="bl2" x="130" y="1206">访客 / 装饰 / 评分 / 当前节气）</text>
-  <text class="bl2" x="130" y="1222">操作 ×12：completeActivity / collect* /</text>
-  <text class="bl2" x="130" y="1238">meetVisitor / setCurrentTerm / setDecoration</text>
-  <text class="bl2" x="130" y="1254">持久化：scopedStorage → localStorage</text>
+  <text class="bl2" x="130" y="1190">IGameProgress：14 字段（岁时值 / 收集×6 /</text>
+  <text class="bl2" x="130" y="1206">访客 / 装饰 / 评分 / 节气 / 种植 /</text>
+  <text class="bl2" x="130" y="1222">好感度 / 背包库存 inventory）</text>
+  <text class="bl2" x="130" y="1238">操作 ×17：complete / collect* / plant /</text>
+  <text class="bl2" x="130" y="1254">harvest / craft / gift / addItem / reset</text>
   <text class="bs" x="110" y="1278">use-mobile.ts · useIsMobile（移动端检测）</text>
 
   <!-- E2 data -->
@@ -235,14 +238,18 @@
   <text class="bl2" x="620" y="1190">24 节气 × 三候 × 活动 × 美食 × 访客 × 作物</text>
   <text class="bl2" x="620" y="1206">节气名 / 日期 / 季节 / 诗词 / 天气</text>
   <rect x="600" y="1226" width="98" height="24" rx="4" fill="#e8ece2"/>
-  <text class="bs" x="649" y="1242" text-anchor="middle">visitors.ts</text>
+  <text class="bs" x="649" y="1242" text-anchor="middle">crops.ts</text>
   <rect x="706" y="1226" width="98" height="24" rx="4" fill="#e8ece2"/>
-  <text class="bs" x="755" y="1242" text-anchor="middle">flowers.ts</text>
+  <text class="bs" x="755" y="1242" text-anchor="middle">visitors.ts</text>
   <rect x="812" y="1226" width="98" height="24" rx="4" fill="#e8ece2"/>
-  <text class="bs" x="861" y="1242" text-anchor="middle">decorations.ts</text>
+  <text class="bs" x="861" y="1242" text-anchor="middle">flowers.ts</text>
   <rect x="918" y="1226" width="98" height="24" rx="4" fill="#e8ece2"/>
-  <text class="bs" x="967" y="1242" text-anchor="middle">handcrafts.ts</text>
-  <text class="bs" x="600" y="1278">※ 节气美食 / 作物已内嵌于 solarTerms.ts（单一来源）</text>
+  <text class="bs" x="967" y="1242" text-anchor="middle">decorations.ts</text>
+  <rect x="600" y="1262" width="98" height="24" rx="4" fill="#e8ece2"/>
+  <text class="bs" x="649" y="1278" text-anchor="middle">handcrafts.ts</text>
+  <rect x="706" y="1262" width="98" height="24" rx="4" fill="#e8ece2"/>
+  <text class="bs" x="755" y="1278" text-anchor="middle">items.ts</text>
+  <text class="bs" x="816" y="1278">※ 节气美食内嵌于 solarTerms.ts</text>
 
   <!-- E3 lib -->
   <rect class="gbox" x="1070" y="1110" width="460" height="176" rx="12" fill="#f4f2ee" stroke="#e0d8c8"/>
@@ -285,7 +292,7 @@
 
   <!-- 底部说明 -->
   <text class="foot" x="800" y="1560" text-anchor="middle">数据流闭环：用户交互 → HomePage 事件回调 → useGameProgress（setState）→ localStorage 持久化 → 各面板订阅 re-render</text>
-  <text class="foot" x="800" y="1580" text-anchor="middle">已修复：清理未接入模块与冗余依赖（gsap / react-markdown / date-fns 等）；补齐 scripts/（dev.mjs / build.mjs / setup-git-hooks.mjs），npm run dev / build 已可用</text>
+  <text class="foot" x="800" y="1580" text-anchor="middle">背包与手作材料链：种植收获（水稻→稻米+稻草）· 节气活动收集 · 访客赠礼 → 背包 → 手作配方消耗（黄麻×3→麻绳、枫桦木×2→木楦、稻草+黄麻+麻绳+木楦→编草鞋）</text>
 </svg>
 </body>
 </html>

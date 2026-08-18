@@ -47,7 +47,7 @@ export default function ScrollPanel({
               <div className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-t from-[hsl(30_25%_60%)] to-[hsl(30_20%_50%)] border-t border-[hsl(30_20%_45%)]" />
 
               <div className="relative h-3" />
-              <div className="relative px-6 pt-4 pb-2 flex items-center justify-between border-b border-border/50">
+              <div className="relative px-4 sm:px-6 pt-4 pb-2 flex items-center justify-between border-b border-border/50">
                 <div>
                   <h2 className="text-xl font-serif text-foreground tracking-wide">{title}</h2>
                   {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
@@ -61,7 +61,7 @@ export default function ScrollPanel({
                 </button>
               </div>
 
-              <div className="relative px-6 py-5 overflow-y-auto max-h-[calc(85vh-80px)] scrollbar-thin">
+              <div className="relative px-4 sm:px-6 py-5 overflow-y-auto max-h-[calc(85vh-80px)] scrollbar-thin">
                 {children}
               </div>
               <div className="relative h-3" />
@@ -104,7 +104,7 @@ export default function ScrollPanel({
               <div className="absolute top-0 bottom-0 left-0 w-2 bg-gradient-to-r from-[hsl(30_20%_55%)] to-transparent z-10" />
 
               <div className="relative h-3" />
-              <div className="relative px-6 pt-4 pb-3 flex items-center justify-between border-b border-border/50">
+              <div className="relative px-4 sm:px-6 pt-4 pb-3 flex items-center justify-between border-b border-border/50">
                 <div>
                   <h2 className="text-xl font-serif text-foreground tracking-wide">{title}</h2>
                   {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
@@ -118,7 +118,7 @@ export default function ScrollPanel({
                 </button>
               </div>
 
-              <div className="relative px-6 py-5 overflow-y-auto h-[calc(100%-72px)] scrollbar-thin">
+              <div className="relative px-4 sm:px-6 py-5 overflow-y-auto h-[calc(100%-72px)] scrollbar-thin">
                 {children}
               </div>
             </div>

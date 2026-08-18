@@ -1,6 +1,10 @@
-// EXPORTS: IGameProgress, useGameProgress, STORAGE_KEY
+// EXPORTS: IGameProgress, IPlantedCrop, useGameProgress, STORAGE_KEY
 
 import { useState, useEffect, useCallback } from 'react';
+import { getCropById, getCropsByTermId } from '@/data/crops';
+import { BASE_MATERIAL_IDS } from '@/data/items';
+import { MOCK_HANDCRAFTS } from '@/data/handcrafts';
+import { MOCK_VISITORS } from '@/data/visitors';
 
 const STORAGE_KEY = '__game_suishiji_progress_v2';
 
@@ -29,6 +33,13 @@ function saveProgress(progress: IGameProgress) {
   }
 }
 
+export interface IPlantedCrop {
+  /** 作物 id（crops.ts） */
+  cropId: string;
+  /** 种植时间戳（ms） */
+  plantedAt: number;
+}
+
 export interface IGameProgress {
   /** 当前累计岁时值 */
   yearValue: number;
@@ -52,6 +63,12 @@ export interface IGameProgress {
   beautyScore: number;
   /** 当前选中节气ID */
   currentTermId: string;
+  /** 菜畦种植记录：key为地块ID，value为种植信息 */
+  crops: Record<string, IPlantedCrop>;
+  /** 访客好感度：visitorId → 好感度数值 */
+  visitorAffinity: Record<string, number>;
+  /** 背包库存：物品id（items.ts）→ 数量 */
+  inventory: Record<string, number>;
 }
 
 const INITIAL_PROGRESS: IGameProgress = {
@@ -66,6 +83,9 @@ const INITIAL_PROGRESS: IGameProgress = {
   decorations: {},
   beautyScore: 0,
   currentTermId: 'lichun',
+  crops: {},
+  visitorAffinity: {},
+  inventory: {},
 };
 
 export function useGameProgress() {
@@ -82,10 +102,23 @@ export function useGameProgress() {
   const completeActivity = useCallback((activityId: string, termId: string, yearValue = 10) => {
     setProgress((prev) => {
       if (prev.completedActivities.includes(activityId)) return prev;
+      // 活动奖励：本节气时令作物材料 ×1（"收集"渠道）
+      const termCrops = getCropsByTermId(termId);
+      const seasonal = termCrops.length > 0 ? termCrops[Math.floor(Math.random() * termCrops.length)] : undefined;
+      const randomBase = BASE_MATERIAL_IDS[Math.floor(Math.random() * BASE_MATERIAL_IDS.length)];
+      const inventory = { ...(prev.inventory ?? {}) };
+      if (seasonal && seasonal.yields.length > 0) {
+        const first = seasonal.yields[0];
+        inventory[first.itemId] = (inventory[first.itemId] ?? 0) + 1;
+      }
+      if (randomBase) {
+        inventory[randomBase] = (inventory[randomBase] ?? 0) + 1;
+      }
       return {
         ...prev,
         yearValue: prev.yearValue + yearValue,
         completedActivities: [...prev.completedActivities, activityId],
+        inventory,
         // 完成活动时自动收集当前节气的第一候作为奖励
         collectedPhenology: prev.collectedPhenology.includes(`${termId}-0`)
           ? prev.collectedPhenology
@@ -179,6 +212,106 @@ export function useGameProgress() {
     });
   }, []);
 
+  /** 在地块上种植作物（同地块重复种植则覆盖） */
+  const plantCrop = useCallback((plotId: string, cropId: string) => {
+    setProgress((prev) => ({
+      ...prev,
+      crops: { ...prev.crops, [plotId]: { cropId, plantedAt: Date.now() } },
+    }));
+  }, []);
+
+  /**
+   * 收获地块作物：清空地块，产出记入 collectedCrops（格式 termId-产出名，去重）
+   * 与背包 inventory（yields.itemId，按数量累加），每个产出 +3 岁时值。
+   */
+  const harvestCrop = useCallback((plotId: string) => {
+    setProgress((prev) => {
+      const planted = prev.crops[plotId];
+      if (!planted) return prev;
+      const crop = getCropById(planted.cropId);
+      if (!crop) return prev;
+      let yearValue = prev.yearValue;
+      let collectedCrops = [...prev.collectedCrops];
+      const inventory = { ...(prev.inventory ?? {}) };
+      for (const y of crop.yields) {
+        const id = `${crop.termId}-${y.name}`;
+        if (!collectedCrops.includes(id)) {
+          collectedCrops = [...collectedCrops, id];
+          yearValue += 3;
+        }
+        // 产出入背包
+        inventory[y.itemId] = (inventory[y.itemId] ?? 0) + y.count;
+      }
+      const crops = { ...prev.crops };
+      delete crops[plotId];
+      return { ...prev, crops, collectedCrops, yearValue, inventory };
+    });
+  }, []);
+
+  /** 向背包添加物品 */
+  const addItem = useCallback((itemId: string, count = 1) => {
+    setProgress((prev) => ({
+      ...prev,
+      inventory: {
+        ...(prev.inventory ?? {}),
+        [itemId]: (prev.inventory?.[itemId] ?? 0) + count,
+      },
+    }));
+  }, []);
+
+  /**
+   * 制作手作：校验配方库存 → 扣除材料 → 计入 collectedArtifacts + 岁时值 +8。
+   * 返回是否制作成功（材料不足 / 已制作过返回 false）。
+   */
+  const craftHandcraft = useCallback((handcraftId: string) => {
+    const hc = MOCK_HANDCRAFTS.find((h) => h.id === handcraftId);
+    if (!hc) return false;
+    let ok = false;
+    setProgress((prev) => {
+      if (prev.collectedArtifacts.includes(handcraftId)) return prev;
+      const inventory = { ...(prev.inventory ?? {}) };
+      for (const [itemId, count] of Object.entries(hc.recipe)) {
+        if ((inventory[itemId] ?? 0) < count) return prev; // 材料不足
+      }
+      for (const [itemId, count] of Object.entries(hc.recipe)) {
+        inventory[itemId] = (inventory[itemId] ?? 0) - count;
+      }
+      ok = true;
+      return {
+        ...prev,
+        inventory,
+        collectedArtifacts: [...prev.collectedArtifacts, handcraftId],
+        yearValue: prev.yearValue + 8,
+      };
+    });
+    return ok;
+  }, []);
+
+  /** 访客好感度满后赠送背包物品（+10 岁时值） */
+  const grantVisitorGift = useCallback((visitorId: string) => {
+    const visitor = MOCK_VISITORS.find((v) => v.id === visitorId);
+    if (!visitor) return;
+    setProgress((prev) => ({
+      ...prev,
+      yearValue: prev.yearValue + 10,
+      inventory: {
+        ...(prev.inventory ?? {}),
+        [visitor.giftItemId]: (prev.inventory?.[visitor.giftItemId] ?? 0) + 1,
+      },
+    }));
+  }, []);
+
+  /** 提升访客好感度（delta 可为负） */
+  const boostAffinity = useCallback((visitorId: string, delta: number) => {
+    setProgress((prev) => ({
+      ...prev,
+      visitorAffinity: {
+        ...prev.visitorAffinity,
+        [visitorId]: (prev.visitorAffinity[visitorId] ?? 0) + delta,
+      },
+    }));
+  }, []);
+
   const resetProgress = useCallback(() => {
     setProgress(INITIAL_PROGRESS);
   }, []);
@@ -195,6 +328,12 @@ export function useGameProgress() {
     meetVisitor,
     setCurrentTerm,
     setDecoration,
+    plantCrop,
+    harvestCrop,
+    boostAffinity,
+    addItem,
+    craftHandcraft,
+    grantVisitorGift,
     resetProgress,
   };
 }
